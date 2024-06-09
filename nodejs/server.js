@@ -1,6 +1,5 @@
 const express = require('express');
 const photosRouter = require('./Routes/photoRoute');
-const ShortLinkRoute = require('./Routes/ShortLinkRoute');
 
 
 
@@ -17,7 +16,6 @@ app.get('/', (req, res) => {
 })
 
 app.use(photosRouter);
-app.use(ShortLinkRoute);
 
 
 app.use((error,request,response,next)=>{

@@ -1,6 +1,6 @@
 const { initializeApp } = require("firebase/app");
 const { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject, listAll } = require("firebase/storage");
-const { getFirestore, collection, addDoc, deleteDoc, doc, getDoc, getDocs } = require("firebase/firestore");
+const { getFirestore, collection, addDoc, deleteDoc, doc, getDoc, getDocs,updateDoc } = require("firebase/firestore");
 const multer = require("multer");
 const config = require("../config/firebase.config");
 const axios = require('axios');
@@ -39,29 +39,64 @@ async function shortenLink(urlToShorten) {
 
 module.exports.savePhoto = async (req, res, next) => {
     try {
-        const currentDate = new Date();
-        const storageRef = ref(storage, `photos/${req.file.originalname + currentDate.toUTCString()}`);
+        const newDocRef = await addDoc(collection(db, "photos"), {});
+        const docId = newDocRef.id;
+
+        const storageRef = ref(storage, `photos/${docId}.${req.file.originalname.split('.').pop()}`);
         const metadata = {
             contentType: req.file.mimetype,
         };
 
         const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
+
         const url = await getDownloadURL(snapshot.ref);
+
         const shortURL = await shortenLink(url);
-        const docRef = await addDoc(collection(db, "photos"), {
-            path: storageRef._location.path_,
+
+        await updateDoc(newDocRef, {
             url,
             shortURL,
         });
 
         res.send({
-            message: 'file uploaded to firebase storage',
+            message: 'File uploaded to Firebase storage',
             url,
-            id: docRef.id
+            id: docId
         });
     } catch (error) {
-        next(error); 
+        next(error);
     }
+
+};
+module.exports.savePhotoShortLink = async (req, res, next) => {
+    try {
+        const newDocRef = await addDoc(collection(db, "photos"), {});
+        const docId = newDocRef.id;
+
+        const storageRef = ref(storage, `photos/${docId}.${req.file.originalname.split('.').pop()}`);
+        const metadata = {
+            contentType: req.file.mimetype,
+        };
+
+        const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
+
+        const url = await getDownloadURL(snapshot.ref);
+
+        const shortURL = await shortenLink(url);
+
+        await updateDoc(newDocRef, {
+            shortURL,
+        });
+
+        res.send({
+            message: 'File uploaded to Firebase storage',
+            shortURL,
+            id: docId
+        });
+    } catch (error) {
+        next(error);
+    }
+
 };
 
 module.exports.deleteByid = async (req, res, next) => {

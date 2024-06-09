@@ -53,8 +53,8 @@ module.exports.savePhoto = async (req, res, next) => {
         const url = await getDownloadURL(snapshot.ref);
 
         await setDoc(newDocRef, {
+            path: storageRef._location.path_,
             url,
-            id: docId 
         });
 
         res.send({
@@ -84,6 +84,7 @@ module.exports.savePhotoShortLink = async (req, res, next) => {
         const url = await getDownloadURL(snapshot.ref);
         const shortURL = await shortenLink(url);
         await setDoc(newDocRef, {
+            path: storageRef._location.path_,
             shortURL
         });
 
@@ -122,7 +123,7 @@ module.exports.getAllPhotos = async (req, res, next) => {
         const querySnapshot = await getDocs(photosCollection);
         const photosData = [];
         querySnapshot.forEach(doc => {
-            photosData.push(doc.data());
+            photosData.push({ id: doc.id, ...doc.data() });
         });
         res.status(200).json(photosData);
     } catch (error) {

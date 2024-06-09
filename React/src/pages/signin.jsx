@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -14,11 +14,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {useSignInWithEmailAndPassword} from 'react-firebase-hooks/auth';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '../common/firebase';
-
-
-
 
 function Copyright(props) {
   return (
@@ -33,13 +30,12 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignIn() {
   const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth);
-
+  const [errorMessage, setErrorMessage] = useState('');
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -53,9 +49,9 @@ export default function SignIn() {
       }
     } catch (err) {
       console.error(err);
+      setErrorMessage('Invalid email or password. Please try again.');
     }
   };
-
 
   const navigate = useNavigate();
 
@@ -64,7 +60,7 @@ export default function SignIn() {
     if (user) {
       navigate('/');
     }
-  }, [user,navigate]);
+  }, [user, navigate]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -84,6 +80,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+          {errorMessage && <Typography variant="body2" color="error">{errorMessage}</Typography>}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"

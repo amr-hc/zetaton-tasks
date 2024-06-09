@@ -1,6 +1,6 @@
 const { initializeApp } = require("firebase/app");
 const { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject, listAll } = require("firebase/storage");
-const { getFirestore, collection, addDoc, deleteDoc, doc, getDoc, getDocs,updateDoc } = require("firebase/firestore");
+const { getFirestore, collection, addDoc, deleteDoc, doc, getDoc, getDocs,updateDoc,setDoc } = require("firebase/firestore");
 const multer = require("multer");
 const config = require("../config/firebase.config");
 const axios = require('axios');
@@ -39,7 +39,8 @@ async function shortenLink(urlToShorten) {
 
 module.exports.savePhoto = async (req, res, next) => {
     try {
-        const newDocRef = await addDoc(collection(db, "photos"), {});
+        const newDocRef = doc(collection(db, "photos"));
+
         const docId = newDocRef.id;
 
         const storageRef = ref(storage, `photos/${docId}.${req.file.originalname.split('.').pop()}`);
@@ -51,8 +52,9 @@ module.exports.savePhoto = async (req, res, next) => {
 
         const url = await getDownloadURL(snapshot.ref);
 
-        await updateDoc(newDocRef, {
+        await setDoc(newDocRef, {
             url,
+            id: docId 
         });
 
         res.send({
@@ -63,11 +65,13 @@ module.exports.savePhoto = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-
 };
+
+
 module.exports.savePhotoShortLink = async (req, res, next) => {
     try {
-        const newDocRef = await addDoc(collection(db, "photos"), {});
+        const newDocRef = doc(collection(db, "photos"));
+
         const docId = newDocRef.id;
 
         const storageRef = ref(storage, `photos/${docId}.${req.file.originalname.split('.').pop()}`);
@@ -78,11 +82,9 @@ module.exports.savePhotoShortLink = async (req, res, next) => {
         const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
 
         const url = await getDownloadURL(snapshot.ref);
-
         const shortURL = await shortenLink(url);
-
-        await updateDoc(newDocRef, {
-            shortURL,
+        await setDoc(newDocRef, {
+            shortURL
         });
 
         res.send({
@@ -93,8 +95,8 @@ module.exports.savePhotoShortLink = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-
 };
+
 
 module.exports.deleteByid = async (req, res, next) => {
     try {

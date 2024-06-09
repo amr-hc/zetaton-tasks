@@ -51,11 +51,8 @@ module.exports.savePhoto = async (req, res, next) => {
 
         const url = await getDownloadURL(snapshot.ref);
 
-        const shortURL = await shortenLink(url);
-
         await updateDoc(newDocRef, {
             url,
-            shortURL,
         });
 
         res.send({

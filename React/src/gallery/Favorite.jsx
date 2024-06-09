@@ -6,7 +6,8 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import IconButton from '@mui/material/IconButton';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import FreeSolo from './FreeSolo';
+import { getFavoriteImages } from "../api/DB";
+
 
 function srcset(image, width, height, rows = 1, cols = 1) {
   return {
@@ -17,45 +18,42 @@ function srcset(image, width, height, rows = 1, cols = 1) {
   };
 }
 
-export default function CustomImageList() {
+export default function Favorite() {
   const [itemData, setItemData] = useState([]);
   const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    if (query) {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get('https://api.pexels.com/v1/search', {
+  useEffect(async () => {
+    const fetchData = async (ids) => {
+      try {
+        const promises = ids.map(async (id) => {
+          const response = await axios.get(`https://api.pexels.com/v1/photos/${id}`, {
             headers: {
               Authorization: 'WkUcCnKyVqvhXCCWROZyPfXZJrJIMyTSreOHqjp5KpeSbu1hGDZ4Lvo7',
             },
-            params: {
-              query: query,
-            },
           });
-          const data = response.data.photos.map(photo => ({
-            img: photo.src.large,
-            title: photo.photographer,
-            author: photo.photographer,
-          }));
-          setItemData(data);
-          console.log(data)
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
+          return {
+            img: response.data.src.large,
+            title: response.data.photographer,
+            author: response.data.photographer,
+          };
+        });
+  
+        const data = await Promise.all(promises);
+        setItemData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    let id_photos = await getFavoriteImages()
+    console.log(JSON.parse(localStorage.getItem('user')).uid)
+    // fetchData([837358, 39866, 445109, 1709003]);
+    fetchData(id_photos);
+  }, []);
+  
 
-      fetchData();
-    }
-  }, [query]);
-
-  const handleSearch = (searchQuery) => {
-    setQuery(searchQuery);
-  };
 
   return (
     <>
-      <FreeSolo onSearch={handleSearch} />
       <ImageList
         sx={{
           width: '100%',

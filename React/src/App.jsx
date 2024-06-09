@@ -1,6 +1,5 @@
 import "./App.css";
 import Contact from "./pages/Contact";
-import About from "./pages/About";
 import {
   Route,
   RouterProvider,
@@ -12,6 +11,7 @@ import SharedLayout from "./layouts/SharedLayout";
 import NotFound from "./pages/NotFound";
 
 import CustomImageList from "./gallery/CustomImageList";
+import Favorite from "./gallery/Favorite";
 import SignUp from "./pages/signup";
 import SignIn from "./pages/signin";
 
@@ -21,7 +21,8 @@ function App() {
       <>
         <Route path="/" element={<SharedLayout />}>
           <Route index element={<Home />} />
-          <Route path="image" element={<CustomImageList />} />
+          <Route path="images" element={<CustomImageList />} />
+          <Route path="favorite" element={<Favorite />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="contact" element={<Contact />} />

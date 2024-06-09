@@ -21,7 +21,6 @@ export function MyNavbar() {
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
-    // Navigate to the sign-in page or any other desired route
     navigate('/signin');
   };
 
@@ -38,6 +37,22 @@ export function MyNavbar() {
               }}
             >
               Home
+            </NavLink>
+            <NavLink
+              to="/images"
+              className={({ isActive }) => {
+                return isActive ? "text-success nav-link" : "nav-link";
+              }}
+            >
+              Search
+            </NavLink>
+            <NavLink
+              to="/favorite"
+              className={({ isActive }) => {
+                return isActive ? "text-success nav-link" : "nav-link";
+              }}
+            >
+              Favorite
             </NavLink>
             </Nav>
             {!user && (

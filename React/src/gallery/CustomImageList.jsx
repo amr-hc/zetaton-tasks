@@ -9,19 +9,17 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import FreeSolo from './FreeSolo';
 import { addToFavorites } from '../api/DB'; // Import the addToFavorites function
 
-
 function srcset(image, width, height, rows = 1, cols = 1) {
   return {
     src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${width * cols}&h=${
-      height * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
+    srcSet: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format&dpr=2 2x`,
   };
 }
 
 export default function CustomImageList() {
   const [itemData, setItemData] = useState([]);
   const [query, setQuery] = useState('');
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     if (query) {
@@ -50,17 +48,11 @@ export default function CustomImageList() {
     }
   }, [query]);
 
-  const handleSearch = (searchQuery) => {
-    setQuery(searchQuery);
-  };
 
-  const handleAddToFavorites = (itemId) => {
-    addToFavorites(itemId);
-  };
 
   return (
     <>
-      <FreeSolo onSearch={handleSearch} />
+      <FreeSolo onSearch={setQuery} />
       <ImageList
         sx={{
           width: '100%',
@@ -90,13 +82,15 @@ export default function CustomImageList() {
                 title={item.title}
                 position="top"
                 actionIcon={
-                  <IconButton
-                    sx={{ color: 'white' }}
-                    aria-label={`star ${item.title}`}
-                    onClick={() => handleAddToFavorites(item.id)} // Call handleAddToFavorites with item ID when IconButton is clicked
-                  >
-                    <StarBorderIcon />
-                  </IconButton>
+                  user ? (
+                    <IconButton
+                      sx={{ color: 'white' }}
+                      aria-label={`star ${item.title}`}
+                      onClick={() => addToFavorites(item.id)}
+                    >
+                      <StarBorderIcon />
+                    </IconButton>
+                  ) : null
                 }
                 actionPosition="left"
               />

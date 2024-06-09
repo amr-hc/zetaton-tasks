@@ -5,8 +5,9 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import IconButton from '@mui/material/IconButton';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { getFavoriteImages } from "../api/DB";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { getFavoriteImages, deleteFromFavorites } from "../api/DB";
+import { useNavigate } from 'react-router-dom';
 
 function srcset(image, width, height, rows = 1, cols = 1) {
   return {
@@ -17,34 +18,32 @@ function srcset(image, width, height, rows = 1, cols = 1) {
 
 export default function Favorite() {
   const [itemData, setItemData] = useState([]);
-  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+
+  const fetchData = async (ids) => {
+    try {
+      const promises = ids.map(async (id) => {
+        const response = await axios.get(`https://api.pexels.com/v1/photos/${id}`, {
+          headers: {
+            Authorization: 'WkUcCnKyVqvhXCCWROZyPfXZJrJIMyTSreOHqjp5KpeSbu1hGDZ4Lvo7',
+          },
+        });
+        return {
+          img: response.data.src.large,
+          title: response.data.photographer,
+          author: response.data.photographer,
+          id: id
+        };
+      });
+
+      const data = await Promise.all(promises);
+      setItemData(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true; // Track if the component is still mounted
-
-    const fetchData = async (ids) => {
-      try {
-        const promises = ids.map(async (id) => {
-          const response = await axios.get(`https://api.pexels.com/v1/photos/${id}`, {
-            headers: {
-              Authorization: 'WkUcCnKyVqvhXCCWROZyPfXZJrJIMyTSreOHqjp5KpeSbu1hGDZ4Lvo7',
-            },
-          });
-          return {
-            img: response.data.src.large,
-            title: response.data.photographer,
-            author: response.data.photographer,
-          };
-        });
-  
-        const data = await Promise.all(promises);
-        if (isMounted) {
-          setItemData(data);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
 
     const initialize = async () => {
       const id_photos = await getFavoriteImages();
@@ -53,10 +52,25 @@ export default function Favorite() {
 
     initialize();
 
-    return () => {
-      isMounted = false; // Cleanup the effect
-    };
+    
   }, []);
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  const handleDeleteFromFavorites = async (idToDelete) => {
+    try {
+      await deleteFromFavorites(idToDelete);
+      const id_photos = await getFavoriteImages();
+      fetchData(id_photos);
+    } catch (error) {
+      console.error('Error deleting from favorites:', error);
+    }
+  };
 
   return (
     <>
@@ -92,8 +106,9 @@ export default function Favorite() {
                   <IconButton
                     sx={{ color: 'white' }}
                     aria-label={`star ${item.title}`}
+                    onClick={() => handleDeleteFromFavorites(item.id)}
                   >
-                    <StarBorderIcon />
+                    <DeleteIcon />
                   </IconButton>
                 }
                 actionPosition="left"

@@ -1,6 +1,5 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { firestore } from "../common/firebase";
-import { updateDoc, arrayUnion } from "firebase/firestore";
 
 const getFavoriteImages = async () => {
   const docRef = doc(firestore, "users", JSON.parse(localStorage.getItem('user')).uid);
@@ -35,5 +34,25 @@ const addToFavorites = async (idToAdd) => {
   }
 };
 
+const deleteFromFavorites = async (idToDelete) => {
+  try {
+    const docRef = doc(firestore, "users", JSON.parse(localStorage.getItem('user')).uid);
+    
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      await updateDoc(docRef, {
+        favorite: arrayRemove(idToDelete)
+      });
+      
+      console.log("ID deleted from favorites successfully.");
+    } else {
+      console.log("User document not found.");
+    }
+  } catch (error) {
+    console.error("Error deleting ID from favorites:", error);
+  }
+};
 
-export { getFavoriteImages, addToFavorites };
+export { getFavoriteImages, addToFavorites, deleteFromFavorites };
+

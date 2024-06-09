@@ -8,13 +8,10 @@ import IconButton from '@mui/material/IconButton';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { getFavoriteImages } from "../api/DB";
 
-
 function srcset(image, width, height, rows = 1, cols = 1) {
   return {
     src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${width * cols}&h=${
-      height * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
+    srcSet: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format&dpr=2 2x`,
   };
 }
 
@@ -22,7 +19,9 @@ export default function Favorite() {
   const [itemData, setItemData] = useState([]);
   const [query, setQuery] = useState('');
 
-  useEffect(async () => {
+  useEffect(() => {
+    let isMounted = true; // Track if the component is still mounted
+
     const fetchData = async (ids) => {
       try {
         const promises = ids.map(async (id) => {
@@ -39,18 +38,25 @@ export default function Favorite() {
         });
   
         const data = await Promise.all(promises);
-        setItemData(data);
+        if (isMounted) {
+          setItemData(data);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-    let id_photos = await getFavoriteImages()
-    console.log(JSON.parse(localStorage.getItem('user')).uid)
-    // fetchData([837358, 39866, 445109, 1709003]);
-    fetchData(id_photos);
-  }, []);
-  
 
+    const initialize = async () => {
+      const id_photos = await getFavoriteImages();
+      fetchData(id_photos);
+    };
+
+    initialize();
+
+    return () => {
+      isMounted = false; // Cleanup the effect
+    };
+  }, []);
 
   return (
     <>

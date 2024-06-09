@@ -7,6 +7,8 @@ import ImageListItemBar from '@mui/material/ImageListItemBar';
 import IconButton from '@mui/material/IconButton';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import FreeSolo from './FreeSolo';
+import { addToFavorites } from '../api/DB'; // Import the addToFavorites function
+
 
 function srcset(image, width, height, rows = 1, cols = 1) {
   return {
@@ -36,10 +38,9 @@ export default function CustomImageList() {
           const data = response.data.photos.map(photo => ({
             img: photo.src.large,
             title: photo.photographer,
-            author: photo.photographer,
+            id: photo.id
           }));
           setItemData(data);
-          console.log(data)
         } catch (error) {
           console.error('Error fetching data:', error);
         }
@@ -51,6 +52,10 @@ export default function CustomImageList() {
 
   const handleSearch = (searchQuery) => {
     setQuery(searchQuery);
+  };
+
+  const handleAddToFavorites = (itemId) => {
+    addToFavorites(itemId);
   };
 
   return (
@@ -88,6 +93,7 @@ export default function CustomImageList() {
                   <IconButton
                     sx={{ color: 'white' }}
                     aria-label={`star ${item.title}`}
+                    onClick={() => handleAddToFavorites(item.id)} // Call handleAddToFavorites with item ID when IconButton is clicked
                   >
                     <StarBorderIcon />
                   </IconButton>

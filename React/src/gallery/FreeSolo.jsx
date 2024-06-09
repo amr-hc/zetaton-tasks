@@ -53,7 +53,7 @@ export default function FreeSolo({ onSearch }) {
           sx={{ flexGrow: 1 }}
         />
         <Button variant="contained" sx={{ ml: 2 }} onClick={handleButtonClick}>
-          Contained
+          Search
         </Button>
       </Box>
     </Box>

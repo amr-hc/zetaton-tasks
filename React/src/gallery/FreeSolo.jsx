@@ -62,24 +62,5 @@ export default function FreeSolo({ onSearch }) {
 
 // Array of photo types
 const photoTypes = [
-  'Portrait',
-  'Landscape',
-  'Macro',
-  'Street',
-  'Architectural',
-  'Event',
-  'Sports',
-  'Wildlife',
-  'Fashion',
-  'Astrophotography',
-  'Black and White',
-  'Travel',
-  'Documentary',
-  'Underwater',
-  'Aerial',
-  'Food',
-  'Fine Art',
-  'Still Life',
-  'Abstract',
-  'Commercial'
+
 ];

@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth, firestore } from '../common/firebase';
-import { collection, doc, setDoc } from "firebase/firestore";
+import {  doc, setDoc } from "firebase/firestore";
 
 
 function SignUp() {

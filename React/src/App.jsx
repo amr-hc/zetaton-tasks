@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import SharedLayout from "./layouts/SharedLayout";
 import NotFound from "./pages/NotFound";
 
+import CustomImageList from "./gallery/CustomImageList";
 import SignUp from "./pages/signup";
 import SignIn from "./pages/signin";
 
@@ -20,6 +21,7 @@ function App() {
       <>
         <Route path="/" element={<SharedLayout />}>
           <Route index element={<Home />} />
+          <Route path="image" element={<CustomImageList />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="contact" element={<Contact />} />
